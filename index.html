@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>맞춤형 관광지도</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+
+    .carousel-outer {
+      width: 100%;
+      max-width: 1200px;
+      margin: 30px auto 0 auto;
+      position: relative;
+    }
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+      background: #eee;
+    }
+    .carousel-image-wrapper {
+      width: 100%;
+      height: 380px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eee;
+    }
+    .carousel-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: 0.3s;
+    }
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(30,30,30,0.4);
+      border: none;
+      font-size: 44px;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.18s;
+    }
+    .carousel-btn.left { left: 16px; }
+    .carousel-btn.right { right: 16px; }
+    .carousel-btn:hover { background: rgba(0,122,204,0.85); }
+    .carousel-caption {
+      padding: 20px 0 10px 0;
+      background: none;
+      text-align: center;
+    }
+    .carousel-caption h2 {
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-size: 1.6rem;
+    }
+    .carousel-caption p {
+      color: #555;
+      font-size: 1.05rem;
+    }
+    .carousel-thumbnails {
+      margin: 15px 0 0 0;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+    .carousel-thumbnails img {
+      width: 58px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 5px;
+      opacity: 0.5;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: border 0.2s, opacity 0.2s;
+    }
+    .carousel-thumbnails img.active {
+      border: 2.5px solid #007acc;
+      opacity: 1;
+      transform: scale(1.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    @media (max-width: 1000px) {
+      .carousel-image-wrapper { height: 220px; }
+      .carousel-outer { max-width: 98vw; }
+    }
+    @media (max-width: 700px) {
+      .carousel-caption h2 { font-size: 1.2rem;}
+      .carousel-image-wrapper { height: 130px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <div class="header-top">
+      <div class="logo-area">
+        <a href="index.html" class="logo-text">맞춤관광지도</a>
+      </div>
+      <div class="search-login-area">
+        <div class="search-box">
+          <input type="text" placeholder="검색어를 입력해 주세요.">
+          <button class="search-btn">🔍</button>
+        </div>
+        <div class="auth-links">
+          <a href="login.html">⇨ 로그인</a>
+          <a href="signup.html">⚙ 회원가입</a>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav-main">
+      <a href="home.html">소개</a>
+      <a href="map.html">맞춤관광지 보러가기</a>
+      <a href="#">테마별 추천</a>
+      <a href="#">게시판</a>
+      <a href="#">공지사항</a>
+      <a href="#">자주 묻는 질문</a>
+    </nav>
+
+    <div class="notice">
+      <strong>알림:</strong> 소개, 맞춤관광지 보러가기, 로그인, 회원가입을 제외한 페이지는 이동되지 않습니다!
+    </div>
+
+
+    <main>
+      <div class="carousel-outer">
+        <div class="carousel-container">
+          <button class="carousel-btn left" onclick="prevSlide()">&#9664;</button>
+          <div class="carousel-image-wrapper">
+            <img id="carousel-img" src="assets/1.png" alt="슬라이드 이미지" />
+          </div>
+          <button class="carousel-btn right" onclick="nextSlide()">&#9654;</button>
+        </div>
+        <div class="carousel-caption">
+          <h2 id="carousel-title">청계천, 서울의 힐링 산책로</h2>
+          <p id="carousel-desc">도심 한가운데에서 자연과 예술이 어우러진 산책을 즐길 수 있는 청계천. 시민과 관광객 모두에게 인기있는 힐링 명소입니다.</p>
+          <div class="carousel-thumbnails" id="carousel-thumbs">
+
+          </div>
+        </div>
+      </div>
+
+   
+    </main>
+
+    <footer>
+      ⓒ 2025 TourMap. 경복대학교 IT융합학과
+    </footer>
+  </div>
+  <script>
+
+    const carouselData = [
+      {
+        img: "assets/1.png",
+        title: "청계천, 서울의 힐링 산책로",
+        desc: "도심 한가운데에서 자연과 예술이 어우러진 산책을 즐길 수 있는 청계천. 시민과 관광객 모두에게 인기있는 힐링 명소입니다."
+      },
+      {
+        img: "assets/2.png",
+        title: "남이섬, 자연 속의 낭만",
+        desc: "강과 숲이 아름답게 어우러진 남이섬에서 잊지 못할 추억을 남겨보세요. 사계절 내내 다른 매력을 느낄 수 있어요."
+      },
+      {
+        img: "assets/3.png",
+        title: "부산 해운대, 바다와 도시의 만남",
+        desc: "푸른 바다와 활기찬 도시가 함께하는 해운대. 다양한 해양 레저와 맛집, 그리고 야경까지 모두 즐길 수 있습니다."
+      },
+      {
+        img: "assets/4.png",
+        title: "경복궁, 시간여행의 시작",
+        desc: "조선의 역사와 전통이 살아 숨쉬는 경복궁에서 특별한 문화체험을 해보세요. 아름다운 궁궐 풍경은 사계절 내내 인상적입니다."
+      },
+      {
+        img: "assets/5.png",
+        title: "제주 오름, 트레킹 천국",
+        desc: "제주의 신비로운 오름과 자연을 트레킹하며 활력을 충전하세요. 사방이 탁 트인 전망과 청정 자연을 경험할 수 있습니다."
+      }
+    ];
+    let currentIdx = 0;
+
+    function updateCarousel() {
+      document.getElementById('carousel-img').src = carouselData[currentIdx].img;
+      document.getElementById('carousel-title').textContent = carouselData[currentIdx].title;
+      document.getElementById('carousel-desc').textContent = carouselData[currentIdx].desc;
+
+      const thumbs = document.getElementById('carousel-thumbs');
+      thumbs.innerHTML = '';
+      carouselData.forEach((item, idx) => {
+        const thumb = document.createElement('img');
+        thumb.src = item.img;
+        thumb.alt = "썸네일 " + (idx + 1);
+        if(idx === currentIdx) thumb.classList.add('active');
+        thumb.onclick = () => { currentIdx = idx; updateCarousel(); };
+        thumbs.appendChild(thumb);
+      });
+    }
+    function prevSlide() {
+      currentIdx = (currentIdx - 1 + carouselData.length) % carouselData.length;
+      updateCarousel();
+    }
+    function nextSlide() {
+      currentIdx = (currentIdx + 1) % carouselData.length;
+      updateCarousel();
+    }
+    window.onload = updateCarousel;
+  </script>
+</body>
+</html>

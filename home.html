@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>맞춤형 관광지도 소개</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    .intro-container {
+      max-width: 1000px;
+      margin: 80px auto;
+      padding: 40px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .intro-container h1 {
+      font-size: 32px;
+      color: #2d3436;
+      margin-bottom: 20px;
+    }
+
+    .intro-container p {
+      font-size: 18px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .highlight-box {
+      margin: 40px 0;
+      padding: 20px;
+      background-color: #ecf0f1;
+      border-left: 5px solid #007acc;
+      text-align: left;
+    }
+
+    .highlight-box h3 {
+      color: #2d3436;
+      margin-bottom: 10px;
+    }
+
+    .highlight-box ul {
+      list-style: square;
+      padding-left: 20px;
+    }
+
+    .highlight-box ul li {
+      margin: 8px 0;
+    }
+
+    .cta-button {
+      margin-top: 30px;
+      padding: 14px 28px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .cta-button:hover {
+      background-color: #01a3a4;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+  
+    <div class="header-top">
+      <div class="logo-area">
+        <a href="index.html" class="logo-text">맞춤관광지도</a>
+      </div>
+      <div class="search-login-area">
+        <div class="search-box">
+          <input type="text" placeholder="검색어를 입력해 주세요.">
+          <button class="search-btn">🔍</button>
+        </div>
+        <div class="auth-links">
+          <a href="login.html">⇨ 로그인</a>
+          <a href="signup.html">⚙ 회원가입</a>
+        </div>
+      </div>
+    </div>
+
+
+    <nav class="nav-main">
+      <a href="home.html">소개</a>
+      <a href="map.html">맞춤관광지 보러가기</a>
+      <a href="#">테마별 추천</a>
+      <a href="#">게시판</a>
+      <a href="#">공지사항</a>
+      <a href="#">자주 묻는 질문</a>
+    </nav>
+
+
+    <main>
+      <div class="intro-container">
+        <h1>맞춤형 관광지도 서비스</h1>
+        <p>
+          본 서비스는 사용자 맞춤형 데이터를 기반으로<br />
+          <strong>여행자의 성향, 현재 위치, 테마 관심도</strong> 등을 분석하여<br />
+          가장 적합한 관광지를 지도 위에 시각적으로 추천해주는 시스템입니다.
+        </p>
+
+        <div class="highlight-box">
+          <h3>주요 기능 안내</h3>
+          <ul>
+            <li>관광지 키워드 검색 기반 테마 자동 추출</li>
+            <li>거리 기반 Top10, 인기 기반 Top10 관광지 추천</li>
+            <li>성별/연령/재방문 의향 등 세부 필터</li>
+            <li>Leaflet 기반 지도 + 마커 + 상세 정보</li>
+            <li>FastAPI + MySQL 연동으로 실시간 응답</li>
+          </ul>
+        </div>
+
+        <p>
+          이 시스템은 <strong>공공 데이터 활용, 관광 활성화, 사용자 편의성</strong>을 최우선으로 기획되었습니다.<br />
+          실제 서비스는 아래 버튼을 눌러 체험하실 수 있습니다.
+        </p>
+
+        <button class="cta-button" onclick="location.href='index.html'">
+          맞춤 관광지 보러가기 →
+        </button>
+      </div>
+    </main>
+
+  
+    <footer>
+      ⓒ 2025 TourMap. 경복대학교 IT융합학과
+    </footer>
+  </div>
+</body>
+</html>

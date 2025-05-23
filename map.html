@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>맞춤형 관광지도 - 추천맵</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    .map-section-flex { display: flex; flex-direction: row; height: 80vh; min-height: 700px; }
+    #left-tabs { width: 100px; background-color: #444; color: white; display: flex; flex-direction: column; align-items: center; padding-top: 10px; }
+    #left-tabs button { width: 90%; margin: 6px 0; padding: 12px 6px; background-color: #666; color: white; border: none; cursor: pointer; font-weight: bold; }
+    .tab-content { display: none; width: 370px; padding: 20px; background: #fff; overflow-y: auto; box-sizing: border-box; border-left: 1px solid #ccc; border-right: 1px solid #ccc; }
+    .tab-content.active { display: block; }
+    #search-box { border: 2px solid green; border-radius: 10px; padding: 10px; margin-bottom: 15px; display: flex; align-items: center; }
+    #keyword { flex: 1; border: none; outline: none; font-size: 16px; }
+    #search-button { background: none; border: none; cursor: pointer; }
+    #search-button img { width: 20px; height: 20px; }
+    .user-filters input { width: 100%; padding: 8px; margin: 4px 0; border: 1px solid green; border-radius: 6px; box-sizing: border-box; background-color: #f8f8f8; }
+    .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px; margin-bottom: 15px; }
+    .checkbox-group label { display: flex; align-items: center; gap: 5px; font-size: 14px; }
+    .button-group { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .button-group button, .submit-button { flex: 1; margin: 5px; padding: 10px; border: 2px solid green; border-radius: 10px; background-color: white; cursor: pointer; font-weight: bold; }
+    .submit-button { width: 100%; margin-top: 10px; }
+    hr.custom-line { margin-top: 20px; border: none; border-top: 2px solid green; }
+    #theme-list { padding: 15px 0; font-size: 16px; }
+    #map { flex: 1; height: 100%; min-height: 650px; }
+    #place-info img { width: 100%; height: 400px; border-radius: 8px; margin-bottom: 5px; object-fit: cover; max-height: 400px; }
+    #place-info h2 { margin: 10px 0 5px; font-size: 20px; color: #222; }
+    #place-info p { margin: 4px 0; color: #555; font-size: 14px; }
+    @media (max-width: 900px) {
+      .map-section-flex { flex-direction: column; height: auto; min-height: 500px; }
+      #left-tabs, .tab-content { width: 100%; min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header-top">
+      <div class="logo-area">
+        <a href="index.html" class="logo-text">맞춤관광지도</a>
+      </div>
+      <div class="search-login-area">
+        <div class="search-box">
+          <input type="text" placeholder="검색어를 입력해 주세요.">
+          <button class="search-btn">🔍</button>
+        </div>
+        <div class="auth-links">
+          <a href="login.html">⇨ 로그인</a>
+          <a href="signup.html">⚙ 회원가입</a>
+        </div>
+      </div>
+    </div>
+    <nav class="nav-main">
+      <a href="home.html">소개</a>
+      <a href="map.html">맞춤관광지 보러가기</a>
+      <a href="#">테마별 추천</a>
+      <a href="#">게시판</a>
+      <a href="#">공지사항</a>
+      <a href="#">자주 묻는 질문</a>
+    </nav>
+    <main>
+      <div class="map-section-flex">
+        <div id="left-tabs">
+          <button onclick="resetMap(false)">지도 홈</button>
+          <button onclick="showTab('info')">정보 보기</button>
+          <button onclick="fetchNearbyPlaces()">거리기반<br />top10</button>
+          <button onclick="fetchPopularPlaces()">인기순<br />top10</button>
+        </div>
+        <div id="home" class="tab-content active">
+          <div id="search-box">
+            <input type="text" id="keyword" placeholder="위치 검색" />
+            <button id="search-button" onclick="searchLocation()">
+              <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="search" />
+            </button>
+          </div>
+          <div class="user-filters">
+            <input type="text" placeholder="나이" disabled />
+            <input type="text" placeholder="성별" disabled />
+            <input type="text" placeholder="방문자 수" disabled />
+            <input type="text" placeholder="별점" disabled />
+            <input type="text" placeholder="재방문 의사" disabled />
+          </div>
+          <hr style="border: 1px solid green;" />
+          <div class="checkbox-group">
+            <label><input type="checkbox" value="문화/예술" />문화/예술</label>
+            <label><input type="checkbox" value="자연/힐링" />자연/힐링</label>
+            <label><input type="checkbox" value="쇼핑/놀이" />쇼핑/놀이</label>
+            <label><input type="checkbox" value="캠핑/스포츠" />캠핑/스포츠</label>
+            <label><input type="checkbox" value="종교/역사/전통" />종교/역사/전통</label>
+            <label><input type="checkbox" value="체험/학습/산업" />체험/학습/산업</label>
+          </div>
+          <div class="button-group">
+            <button onclick="fetchNearbyPlaces()">거리기반 top10</button>
+            <button onclick="fetchPopularPlaces()">인기순 top10</button>
+          </div>
+          <button class="submit-button" onclick="fetchRecommendation(true)">조회 버튼</button>
+          <hr class="custom-line" />
+          <div id="theme-list">
+            <strong>테마 top10</strong>
+            <ol id="theme-top10-list"></ol>
+          </div>
+        </div>
+        <div id="info" class="tab-content">
+          <div id="place-info"></div>
+        </div>
+        <div id="map"></div>
+      </div>
+    </main>
+
+    <footer>
+      ⓒ 2025 TourMap. 경복대학교 IT융합학과
+    </footer>
+  </div>
+  <script>
+    let map;
+    let poiMarkers = [];
+    let lastSearchCoords = null;
+    let latestResults = null;
+    let searchKeyword = "";
+    let searchMarker = null;
+
+    window.onload = function () {
+      map = L.map('map').setView([36.5, 127.5], 7);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+    };
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function getIconByTheme(theme, isSearch = false) {
+      const colorMap = {
+        '문화/예술': 'orange',
+        '자연/힐링': 'green',
+        '쇼핑/놀이': 'violet',
+        '캠핑/스포츠': 'blue',
+        '종교/역사/전통': 'gold',
+        '체험/학습/산업': 'yellow',
+        '검색': 'red'
+      };
+      const color = isSearch ? 'red' : (colorMap[theme] || 'gray');
+      return L.icon({
+        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        shadowSize: [41, 41]
+      });
+    }
+
+    function showPlaceInfo(place) {
+      showTab('info');
+      map.flyTo([place.latitude, place.longitude], 15);
+      document.getElementById('place-info').innerHTML = `
+        <img src="${place.image_url || 'https://via.placeholder.com/300x200'}" alt="${place.name}" />
+        <h2>${place.name}</h2>
+        <p><strong>테마:</strong> ${place.theme}</p>
+        <p><strong>거리:</strong> ${place.distance ? place.distance.toFixed(1) : '-'} km</p>
+        <p>${place.description || '설명이 없습니다.'}</p>`;
+    }
+
+    function searchLocation() {
+      const keyword = document.getElementById("keyword").value;
+      if (!keyword) return;
+      searchKeyword = keyword;
+      poiMarkers.forEach(m => map.removeLayer(m));
+      poiMarkers = [];
+      if (searchMarker) map.removeLayer(searchMarker);
+      document.getElementById("theme-top10-list").innerHTML = "";
+      fetch(`http://127.0.0.1:8000/get-theme-places?keyword=${encodeURIComponent(keyword)}`)
+        .then(res => res.json())
+        .then(data => {
+          latestResults = data;
+          lastSearchCoords = { lat: data.base.latitude, lon: data.base.longitude };
+          searchMarker = L.marker([data.base.latitude, data.base.longitude], {
+            icon: getIconByTheme('검색', true)
+          }).addTo(map);
+          searchMarker.bindPopup(`${data.base.name}`).openPopup();
+          map.flyTo([data.base.latitude, data.base.longitude], 14);
+          document.querySelectorAll('.checkbox-group input[type=checkbox]').forEach(cb => {
+            cb.checked = (cb.value === data.theme);
+          });
+        });
+    }
+
+    function fetchNearbyPlaces() {
+      if (!lastSearchCoords) return;
+      poiMarkers.forEach(m => map.removeLayer(m));
+      poiMarkers = [];
+      document.getElementById("theme-top10-list").innerHTML = "";
+      const checkedThemes = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
+      checkedThemes.forEach(theme => {
+        fetch(`http://127.0.0.1:8000/get-other-theme-places?lat=${lastSearchCoords.lat}&lon=${lastSearchCoords.lon}&theme=${encodeURIComponent(theme)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.results && data.results.length > 0) {
+              data.results.slice(0, 10).forEach((item, idx) => {
+                const marker = L.marker([item.latitude, item.longitude], {
+                  icon: getIconByTheme(item.theme)
+                }).addTo(map);
+                marker.bindTooltip(`${idx + 1}. ${item.name}<br>테마: ${item.theme}<br>거리: ${item.distance.toFixed(1)}km`);
+                marker.on('click', () => showPlaceInfo(item));
+                poiMarkers.push(marker);
+                const li = document.createElement("li");
+                li.textContent = `${idx + 1}. ${item.name}`;
+                document.getElementById("theme-top10-list").appendChild(li);
+                if (idx === 0) map.flyTo([item.latitude, item.longitude], 13);
+              });
+            }
+          });
+      });
+    }
+
+    function fetchPopularPlaces() {
+      if (!lastSearchCoords) return;
+      poiMarkers.forEach(m => map.removeLayer(m));
+      poiMarkers = [];
+      document.getElementById("theme-top10-list").innerHTML = "";
+      const allThemes = ['문화/예술', '자연/힐링', '쇼핑/놀이', '캠핑/스포츠', '종교/역사/전통', '체험/학습/산업'];
+      allThemes.forEach(theme => {
+        fetch(`http://127.0.0.1:8000/get-other-theme-places?lat=${lastSearchCoords.lat}&lon=${lastSearchCoords.lon}&theme=${encodeURIComponent(theme)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.results && data.results.length > 0) {
+              data.results.slice(0, 2).forEach((item, idx) => {
+                const marker = L.marker([item.latitude, item.longitude], {
+                  icon: getIconByTheme(item.theme)
+                }).addTo(map);
+                marker.bindTooltip(`${item.name}<br>테마: ${item.theme}<br>거리: ${item.distance.toFixed(1)}km`);
+                marker.on('click', () => showPlaceInfo(item));
+                poiMarkers.push(marker);
+                const li = document.createElement("li");
+                li.textContent = `${item.name}`;
+                document.getElementById("theme-top10-list").appendChild(li);
+              });
+            }
+          });
+      });
+    }
+
+    function fetchRecommendation(clearPrevious = false) {
+      fetchNearbyPlaces();
+    }
+
+    function resetMap(clearAll = false) {
+      showTab('home');
+      poiMarkers.forEach(m => map.removeLayer(m));
+      poiMarkers = [];
+      if (clearAll && searchMarker) map.removeLayer(searchMarker);
+      if (clearAll) {
+        document.querySelectorAll('.checkbox-group input[type=checkbox]').forEach(cb => cb.checked = false);
+        document.getElementById("keyword").value = "";
+        searchKeyword = "";
+      }
+      document.getElementById("theme-top10-list").innerHTML = "";
+      map.setView([36.5, 127.5], 7);
+    }
+  </script>
+</body>
+</html>
